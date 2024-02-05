@@ -1,0 +1,104 @@
+/* -------------------- sagar gaud solution for the Word Composition Problem  --------------------*/
+
+#include <iostream>
+#include <vector>
+#include <string>
+#include <unordered_set>
+#include <algorithm>
+#include <chrono>
+
+using namespace std;
+using namespace std::chrono;
+
+#define ll long long
+#define pb push_back
+#define wl(i,n) for (int i=0;i<n;i++)
+#define miss(i,x,n) for (int i=x;i<n;i++)
+#define fo(n,i) for (int i=n-1;i>=0;i--)
+#define br cout<<endl
+#define vi vector<int>
+#define ff first
+#define ss second
+#define all(x) x.begin(), x.end()
+#define mod 1000000007
+
+bool compareStringsBySize(const string& str1, const string& str2) {
+    return (str1.size() == str2.size()) ? (str1 < str2) : (str1.size() < str2.size());
+}
+
+void solve() {
+    vector<string> words;
+    string inputWord;
+    unordered_set<string> wordSet;
+
+    while (cin >> inputWord) {
+        words.push_back(inputWord);
+        wordSet.insert(inputWord);
+    }
+
+    string lcmpw, secondLongestCompoundWord;
+    lcmpw = secondLongestCompoundWord = "";
+
+    sort(words.begin(), words.end(), compareStringsBySize);
+    int currentIndex = words.size() - 1;
+    vector<bool> isCompoundWord(1001);
+
+    while (currentIndex >= 0) {
+        string &currentWord = words[currentIndex--];
+        int wordLength = currentWord.size();
+        string subWord;
+        fill(isCompoundWord.begin(), isCompoundWord.end(), false);
+
+        for (int i = 0; i < wordLength; i++) {
+            subWord = "";
+            for (int j = 0; j <= i; j++) {
+                if (wordSet.count(currentWord.substr(j, i - j + 1))) {
+                    if (j == 0 && i != wordLength - 1) {
+                        isCompoundWord[i] = true;
+                        break;
+                    } else if (j > 0 && isCompoundWord[j - 1]) {
+                        isCompoundWord[i] = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (isCompoundWord[wordLength - 1]) {
+            if (lcmpw == "") {
+                lcmpw = currentWord;
+            } else if (secondLongestCompoundWord == "") {
+                secondLongestCompoundWord = currentWord;
+            } else {
+                break;
+            }
+        }
+    }
+
+    cout << "Longest compound word: " << lcmpw << "\n";
+    cout << "Second longest compound word: " << secondLongestCompoundWord << "\n";
+}
+
+int main() {   
+    ios_base::sync_with_stdio(0);
+    cin.tie(0);
+
+    #ifndef ONLINE_JUDGE
+    freopen("input.txt", "r", stdin);
+    freopen("output.txt", "w", stdout);
+    #endif
+
+    int totalTestCases = 1;
+    int currentIndex = 1;
+    auto startTime = high_resolution_clock::now();
+   
+    while (totalTestCases--) { 
+        currentIndex++;
+        solve();
+        cout << "\n";
+    }
+
+    auto stopTime = high_resolution_clock::now();
+    auto elapsedTime = duration_cast<milliseconds>(stopTime - startTime);
+    cout << "Time taken to process input file: " << elapsedTime.count() << " milliseconds";
+}
